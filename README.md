@@ -1,4 +1,4 @@
-###How to use:
+### How to use:
 
 * You must have Decay0 executable program in this folder.
 * The folder should be writeable.
