@@ -5,6 +5,7 @@ import os
 import uuid
 import argparse
 import sys
+import string
 
 
 class Convert:
@@ -71,10 +72,9 @@ class Convert:
             elif isinstance(line, self.Event):
                 self.output.write(str(len(line)) + "\n")
                 for particle in line.particles:
-                    self.output.write("0 %s 0 0 %s %s %s 0 %s 0 0 0 0 0\n" %
-                                      (particle.PDGCode, particle.momentum[0], particle.momentum[1],
-                                       particle.momentum[2],
-                                       particle.time))
+                    self.output.write("1 %s 0 0 %s %s %s %s\n" %
+                                      (particle.PDGCode, float(particle.momentum[0])/1000, float(particle.momentum[1])/1000,
+                                       float(particle.momentum[2])/1000, 1.511E-3))
         self.output.flush()
         self.output.close()
 
