@@ -66,18 +66,20 @@ class Convert:
             self.output = open(unicode(self.output), "w")
         else:
             self.output = sys.stdout
+        event_count = 0
         for line in self.data_lines:
             if isinstance(line, self.Comment):
                 pass
             elif isinstance(line, self.Event):
-                self.output.write(str(len(line)) + "\n")
-                i = 1
+                event_count += 1
+                self.output.write(str(event_count) + " " + str(len(line)) + "\n")
+                particle_count = 0
                 for particle in line.particles:
+                    particle_count += 1
                     self.output.write("%s %s %s %s %s\n" %
-                                      (i, particle.PDGCode, float(particle.momentum[0]) / 1000,
+                                      (particle_count, particle.PDGCode, float(particle.momentum[0]) / 1000,
                                        float(particle.momentum[1]) / 1000,
                                        float(particle.momentum[2]) / 1000))
-                    i += 1
         self.output.flush()
         self.output.close()
 
@@ -122,7 +124,7 @@ def build_arg_parser():
     # parser.add_argument('-c', '--config', help="The Info passed to Decay0. Like 1|Xe136|0|1|1000|1", required=True)
     parser.add_argument('-m', '--mode', choices=["0nubb", "2nubb"], required=True,
                         help="Input the mode of Double Beta Decay.")
-    parser.add_argument('-n', '--num', default=100, help="The number of generated events.")
+    parser.add_argument('-n', '--num', type=int, default=100, help="The number of generated events.")
     parser.add_argument('-o', '--output', help="Output file.")
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
     return parser
@@ -131,7 +133,7 @@ def build_arg_parser():
 if __name__ == '__main__':
     args = build_arg_parser().parse_args()
     manager = Manager()
-    manager.parse(args.mode, args.num)
+    manager.parse(args.mode, args.num + 1)
     if args.output:
         manager.output_file = args.output
     manager.run()
