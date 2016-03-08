@@ -5,6 +5,7 @@ import os
 import uuid
 import argparse
 import sys
+import string
 
 
 class Convert:
@@ -70,11 +71,13 @@ class Convert:
                 pass
             elif isinstance(line, self.Event):
                 self.output.write(str(len(line)) + "\n")
+                i = 1
                 for particle in line.particles:
-                    self.output.write("0 %s 0 0 %s %s %s 0 %s 0 0 0 0 0\n" %
-                                      (particle.PDGCode, particle.momentum[0], particle.momentum[1],
-                                       particle.momentum[2],
-                                       particle.time))
+                    self.output.write("%s %s 0 0 %s %s %s %s\n" %
+                                      (i, particle.PDGCode, float(particle.momentum[0]) / 1000,
+                                       float(particle.momentum[1]) / 1000,
+                                       float(particle.momentum[2]) / 1000, 1.511E-3))
+                    i += 1
         self.output.flush()
         self.output.close()
 
@@ -88,8 +91,11 @@ class Manager():
         self.tmp_file = uuid.uuid4().__str__() + ".tmp"
         self.output_file = None
 
-    def parse(self, input):
-        self.inputs = input.strip().split("|")
+    def parse(self, input, num):
+        if input == "0nubb":
+            self.inputs = ['1', 'Xe136', '0', '1', str(num), '1']
+        else:
+            self.inputs = ["1", "Xe136", "0", "4", "N", str(num), "1"]
 
     def run(self):
         if not os.path.isfile(self.program_name):
@@ -113,7 +119,10 @@ class Manager():
 
 def build_arg_parser():
     parser = argparse.ArgumentParser(description='Wrapper of Decay0.')
-    parser.add_argument('-c', '--config', help="The Info passed to Decay0. Like 1|Xe136|0|1|1000|1", required=True)
+    # parser.add_argument('-c', '--config', help="The Info passed to Decay0. Like 1|Xe136|0|1|1000|1", required=True)
+    parser.add_argument('-m', '--mode', choices=["0nubb", "2nubb"], required=True,
+                        help="Input the mode of Double Beta Decay.")
+    parser.add_argument('-n', '--num', default=100, help="The number of generated events.")
     parser.add_argument('-o', '--output', help="Output file.")
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
     return parser
@@ -122,7 +131,7 @@ def build_arg_parser():
 if __name__ == '__main__':
     args = build_arg_parser().parse_args()
     manager = Manager()
-    manager.parse(args.config)
+    manager.parse(args.mode, args.num)
     if args.output:
         manager.output_file = args.output
     manager.run()
