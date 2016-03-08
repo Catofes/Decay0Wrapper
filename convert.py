@@ -73,10 +73,10 @@ class Convert:
                 self.output.write(str(len(line)) + "\n")
                 i = 1
                 for particle in line.particles:
-                    self.output.write("%s %s 0 0 %s %s %s %s\n" %
+                    self.output.write("%s %s %s %s %s\n" %
                                       (i, particle.PDGCode, float(particle.momentum[0]) / 1000,
                                        float(particle.momentum[1]) / 1000,
-                                       float(particle.momentum[2]) / 1000, 1.511E-3))
+                                       float(particle.momentum[2]) / 1000))
                     i += 1
         self.output.flush()
         self.output.close()
