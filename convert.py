@@ -89,9 +89,10 @@ class Manager():
         self.convert = Convert()
         self.program_handler = None
         self.inputs = []
-        self.program_name = './decay0'
+        self.program_name = sys.path[0] + '/decay0'
         self.tmp_file = uuid.uuid4().__str__() + ".tmp"
         self.output_file = None
+        self.keep = None
 
     def parse(self, input, num):
         if input == "0nubb":
@@ -102,6 +103,8 @@ class Manager():
     def run(self):
         if not os.path.isfile(self.program_name):
             print("Decay0 didn't find. Please put it in the same directory.")
+            print("Decay0 should be in " + self.program_name)
+            exit(1)
         self.program_handler = subprocess.Popen(self.program_name,
                                                 stdin=subprocess.PIPE,
                                                 stdout=subprocess.PIPE,
@@ -116,7 +119,10 @@ class Manager():
         self.convert.parse()
         self.convert.output = self.output_file
         self.convert.save_to_file()
-        os.remove(self.tmp_file)
+        if self.keep:
+            os.rename(self.tmp_file, self.keep)
+        else:
+            os.remove(self.tmp_file)
 
 
 def build_arg_parser():
@@ -126,6 +132,7 @@ def build_arg_parser():
                         help="Input the mode of Double Beta Decay.")
     parser.add_argument('-n', '--num', type=int, default=100, help="The number of generated events.")
     parser.add_argument('-o', '--output', help="Output file.")
+    parser.add_argument('-k', '--keep', help="Keep the original decay0 file.")
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
     return parser
 
@@ -136,4 +143,6 @@ if __name__ == '__main__':
     manager.parse(args.mode, args.num + 1)
     if args.output:
         manager.output_file = args.output
+    if args.keep:
+        manager.keep = args.keep
     manager.run()
