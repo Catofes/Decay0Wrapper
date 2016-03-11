@@ -93,12 +93,13 @@ class Manager():
         self.tmp_file = uuid.uuid4().__str__() + ".tmp"
         self.output_file = None
         self.keep = None
+        self.seed = str(int(int(uuid.uuid4().hex, 16) % 2147483647))
 
     def parse(self, input, num):
         if input == "0nubb":
-            self.inputs = ['1', 'Xe136', '0', '1', str(num), '1']
+            self.inputs = ['1', 'Xe136', '0', '1', str(num), '1', self.seed]
         else:
-            self.inputs = ["1", "Xe136", "0", "4", "N", str(num), "1"]
+            self.inputs = ["1", "Xe136", "0", "4", "N", str(num), "1", self.seed]
 
     def run(self):
         if not os.path.isfile(self.program_name):
@@ -133,6 +134,8 @@ def build_arg_parser():
     parser.add_argument('-n', '--num', type=int, default=100, help="The number of generated events.")
     parser.add_argument('-o', '--output', help="Output file.")
     parser.add_argument('-k', '--keep', help="Keep the original decay0 file.")
+    parser.add_argument('-s', '--seed',
+                        help="Pass random init seed to Decay0. If not set, random seed will use. Should be an int32.")
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
     return parser
 
@@ -140,9 +143,11 @@ def build_arg_parser():
 if __name__ == '__main__':
     args = build_arg_parser().parse_args()
     manager = Manager()
-    manager.parse(args.mode, args.num + 1)
     if args.output:
         manager.output_file = args.output
     if args.keep:
         manager.keep = args.keep
+    if args.seed:
+        manager.seed = args.seed
+    manager.parse(args.mode, args.num + 1)
     manager.run()
