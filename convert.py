@@ -96,10 +96,14 @@ class Manager():
         self.seed = str(int(int(uuid.uuid4().hex, 16) % 2147483647))
 
     def parse(self, input, num):
-        if input == "0nubb":
+        if input == "Xe-0nubb":
             self.inputs = ['1', 'Xe136', '0', '1', str(num), '1', self.seed]
-        else:
+        elif input == "Xe-2nubb":
             self.inputs = ["1", "Xe136", "0", "4", "N", str(num), "1", self.seed]
+        elif input == "Te130-0nubb":
+            self.inputs = ['1', 'Te130', '0', '1', str(num), '1', self.seed]
+        else:
+            exit(1)
 
     def run(self):
         if not os.path.isfile(self.program_name):
@@ -129,7 +133,7 @@ class Manager():
 def build_arg_parser():
     parser = argparse.ArgumentParser(description='Wrapper of Decay0.')
     # parser.add_argument('-c', '--config', help="The Info passed to Decay0. Like 1|Xe136|0|1|1000|1", required=True)
-    parser.add_argument('-m', '--mode', choices=["0nubb", "2nubb"], required=True,
+    parser.add_argument('-m', '--mode', choices=["Xe-0nubb", "Xe-2nubb", "Te130-0nubb"], required=True,
                         help="Input the mode of Double Beta Decay.")
     parser.add_argument('-n', '--num', type=int, default=100, help="The number of generated events.")
     parser.add_argument('-o', '--output', help="Output file.")
